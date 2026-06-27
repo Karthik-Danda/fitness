@@ -229,11 +229,15 @@
   .cal-cell.sel .cal-num{background:var(--blue);color:#fff;font-weight:800;}
 
   /* ---------- Autocomplete dropdown ---------- */
-  .ac{position:fixed;background:#fff;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18);z-index:80;
-    overflow:hidden auto;border:1px solid var(--line);max-height:236px;}
-  .ac-item{padding:11px 14px;font-size:15px;font-weight:500;color:var(--ink);cursor:pointer;border-top:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ac{position:fixed;background:#fff;border-radius:16px;box-shadow:0 14px 44px rgba(0,0,0,.20);z-index:80;
+    overflow:hidden auto;border:1px solid var(--line);max-height:360px;min-width:280px;}
+  .ac-item{padding:11px 15px;cursor:pointer;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:2px;}
   .ac-item:first-child{border-top:none;}
-  .ac-item:hover,.ac-item.on{background:var(--card-2);}
+  .ac-item:hover,.ac-item.on{background:#F0F6FF;}
+  .ac-name{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ac-meta{font-size:12.5px;font-weight:600;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ac-meta .off{color:#0091EA;font-weight:800;}
+  .ac-empty{padding:13px 15px;font-size:14px;font-weight:600;color:var(--ink-3);}
 
   /* ---------- Water drop ---------- */
   .water{display:flex;flex-direction:column;align-items:center;gap:9px;flex:0 0 auto;}
@@ -245,6 +249,22 @@
   .water-btns button{border:none;background:#E7F4FE;color:#0091EA;border-radius:11px;padding:8px 11px;
     font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:.12s;}
   .water-btns button:active{filter:brightness(.94);}
+
+  /* ---------- Food log ---------- */
+  .meal-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .meal-list:empty{display:none;}
+  .fooditem{display:flex;align-items:center;gap:8px;background:var(--card-2);border-radius:11px;padding:9px 8px 9px 12px;}
+  .fi-n{flex:1;font-size:14px;font-weight:600;color:var(--ink);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .fi-m{font-size:12px;font-weight:700;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .fi-x{border:none;background:transparent;color:var(--ink-3);font-size:19px;font-weight:700;cursor:pointer;width:24px;height:24px;border-radius:50%;line-height:1;flex:0 0 auto;}
+  .fi-x:active{background:rgba(0,0,0,.06);}
+  .ac-food{display:flex;align-items:center;gap:10px;justify-content:space-between;}
+  .ac-food .fn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .ac-food .fm{font-size:12px;font-weight:700;color:var(--ink-3);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .ac-custom{color:var(--blue);font-weight:700;}
+  .ac-food .off{font-size:10px;font-weight:800;color:#34C759;letter-spacing:.02em;}
+  .autotag{font-size:10px;font-weight:800;color:var(--ink-3);letter-spacing:.03em;}
+  .tile input[readonly]{cursor:default;}
 
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;
     background:#1C1C1E;color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:700;
@@ -324,12 +344,12 @@
               <div class="field"><input id="in-burned" inputmode="numeric" placeholder="0" /><span class="unit">cal</span></div>
             </div>
             <div class="tile t-consumed">
-              <label>Calories Consumed</label>
-              <div class="field"><input id="in-consumed" inputmode="numeric" placeholder="0" /><span class="unit">cal</span></div>
+              <label>Calories Consumed <span class="autotag">· auto</span></label>
+              <div class="field"><input id="in-consumed" inputmode="numeric" placeholder="0" readonly /><span class="unit">cal</span></div>
             </div>
             <div class="tile t-protein">
-              <label>Protein</label>
-              <div class="field"><input id="in-protein" inputmode="numeric" placeholder="0" /><span class="unit">g</span></div>
+              <label>Protein <span class="autotag">· auto</span></label>
+              <div class="field"><input id="in-protein" inputmode="numeric" placeholder="0" readonly /><span class="unit">g</span></div>
             </div>
           </div>
 
@@ -362,9 +382,21 @@
             <svg class="chev" width="9" height="14" viewBox="0 0 9 14" fill="none"><path d="M1 1l6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div class="check-body">
-            <div class="sub"><label class="cap">Breakfast</label><input class="txt" id="diet-breakfast" placeholder="What did you eat?" /></div>
-            <div class="sub"><label class="cap">Lunch</label><input class="txt" id="diet-lunch" placeholder="What did you eat?" /></div>
-            <div class="sub"><label class="cap">Dinner</label><input class="txt" id="diet-dinner" placeholder="What did you eat?" /></div>
+            <div class="sub">
+              <label class="cap">Breakfast</label>
+              <input class="txt" id="diet-breakfast" placeholder="Search food…" autocomplete="off" />
+              <div class="meal-list" id="meal-breakfast"></div>
+            </div>
+            <div class="sub">
+              <label class="cap">Lunch</label>
+              <input class="txt" id="diet-lunch" placeholder="Search food…" autocomplete="off" />
+              <div class="meal-list" id="meal-lunch"></div>
+            </div>
+            <div class="sub">
+              <label class="cap">Dinner</label>
+              <input class="txt" id="diet-dinner" placeholder="Search food…" autocomplete="off" />
+              <div class="meal-list" id="meal-dinner"></div>
+            </div>
           </div>
         </div>
 
@@ -491,6 +523,9 @@
 <script>
 "use strict";
 
+/* ============ Nutrition dataset ============ */
+const FOODS=[{"n":"Chicken breast, grilled (120g)","kcal":198,"p":37},{"n":"Chicken thigh, cooked (100g)","kcal":209,"p":26},{"n":"Chicken drumstick (1, cooked)","kcal":76,"p":12},{"n":"Turkey breast, roasted (100g)","kcal":135,"p":30},{"n":"Lean beef steak (120g)","kcal":250,"p":36},{"n":"Ground beef 85% (100g)","kcal":215,"p":26},{"n":"Pork chop, cooked (120g)","kcal":231,"p":31},{"n":"Bacon (2 slices)","kcal":92,"p":6},{"n":"Ham, sliced (60g)","kcal":91,"p":11},{"n":"Lamb, cooked (100g)","kcal":294,"p":25},{"n":"Mutton curry (1 cup)","kcal":300,"p":24},{"n":"Chicken tikka (100g)","kcal":180,"p":25},{"n":"Tandoori chicken (100g)","kcal":165,"p":25},{"n":"Chicken curry (1 cup)","kcal":290,"p":22},{"n":"Salmon, cooked (120g)","kcal":233,"p":25},{"n":"Tuna, canned in water (100g)","kcal":116,"p":26},{"n":"Tilapia, cooked (120g)","kcal":155,"p":32},{"n":"Cod, cooked (120g)","kcal":126,"p":27},{"n":"Shrimp, cooked (100g)","kcal":99,"p":24},{"n":"Sardines, canned (100g)","kcal":208,"p":25},{"n":"Mackerel, cooked (100g)","kcal":262,"p":24},{"n":"Fish curry (1 cup)","kcal":240,"p":20},{"n":"Large egg (1)","kcal":78,"p":6},{"n":"2 large eggs","kcal":156,"p":13},{"n":"Egg white (1)","kcal":17,"p":4},{"n":"Omelette, 2-egg (plain)","kcal":170,"p":12},{"n":"Scrambled eggs (2)","kcal":200,"p":14},{"n":"Greek yogurt, plain (170g)","kcal":100,"p":17},{"n":"Yogurt, plain (170g)","kcal":107,"p":9},{"n":"Cottage cheese (100g)","kcal":98,"p":11},{"n":"Paneer (100g)","kcal":265,"p":18},{"n":"Cheddar cheese (30g)","kcal":120,"p":7},{"n":"Mozzarella (30g)","kcal":85,"p":6},{"n":"Whole milk (1 cup)","kcal":149,"p":8},{"n":"Skim milk (1 cup)","kcal":83,"p":8},{"n":"Buttermilk (1 cup)","kcal":98,"p":8},{"n":"Butter (1 tbsp)","kcal":102,"p":0},{"n":"Ghee (1 tbsp)","kcal":112,"p":0},{"n":"Lentils, cooked (1 cup)","kcal":230,"p":18},{"n":"Dal, cooked (1 cup)","kcal":198,"p":12},{"n":"Chickpeas, cooked (1 cup)","kcal":269,"p":15},{"n":"Chana masala (1 cup)","kcal":269,"p":11},{"n":"Rajma (1 cup)","kcal":215,"p":13},{"n":"Black beans, cooked (1 cup)","kcal":227,"p":15},{"n":"Kidney beans (1 cup)","kcal":225,"p":15},{"n":"Tofu, firm (100g)","kcal":144,"p":17},{"n":"Tempeh (100g)","kcal":192,"p":20},{"n":"Edamame (1 cup)","kcal":188,"p":18},{"n":"Hummus (2 tbsp)","kcal":70,"p":2},{"n":"Peanut butter (2 tbsp)","kcal":188,"p":8},{"n":"Soy milk (1 cup)","kcal":105,"p":6},{"n":"Whey protein scoop (30g)","kcal":120,"p":24},{"n":"Plant protein scoop (30g)","kcal":110,"p":21},{"n":"Protein shake (1 bottle)","kcal":160,"p":30},{"n":"Protein bar (1)","kcal":200,"p":20},{"n":"Mass gainer scoop (60g)","kcal":250,"p":15},{"n":"White rice, cooked (1 cup)","kcal":205,"p":4},{"n":"Brown rice, cooked (1 cup)","kcal":216,"p":5},{"n":"Basmati rice, cooked (1 cup)","kcal":210,"p":4},{"n":"Quinoa, cooked (1 cup)","kcal":222,"p":8},{"n":"Roti / chapati (1)","kcal":104,"p":3},{"n":"Naan (1)","kcal":262,"p":9},{"n":"Paratha (1)","kcal":260,"p":5},{"n":"Whole wheat bread (1 slice)","kcal":80,"p":4},{"n":"White bread (1 slice)","kcal":75,"p":2},{"n":"Bagel (1)","kcal":245,"p":10},{"n":"Oats, cooked (1 cup)","kcal":154,"p":6},{"n":"Oatmeal with milk (1 bowl)","kcal":220,"p":9},{"n":"Pasta, cooked (1 cup)","kcal":221,"p":8},{"n":"Spaghetti, cooked (1 cup)","kcal":221,"p":8},{"n":"Idli (2)","kcal":116,"p":4},{"n":"Plain dosa (1)","kcal":133,"p":3},{"n":"Masala dosa (1)","kcal":250,"p":6},{"n":"Upma (1 cup)","kcal":250,"p":6},{"n":"Poha (1 cup)","kcal":250,"p":5},{"n":"Pongal (1 cup)","kcal":280,"p":7},{"n":"Couscous, cooked (1 cup)","kcal":176,"p":6},{"n":"Cornflakes (1 cup)","kcal":100,"p":2},{"n":"Muesli (1 cup)","kcal":289,"p":8},{"n":"Granola (1/2 cup)","kcal":230,"p":5},{"n":"Pancakes (2)","kcal":175,"p":5},{"n":"French toast (1 slice)","kcal":149,"p":5},{"n":"Tortilla, flour (1)","kcal":140,"p":4},{"n":"Biryani (1 cup)","kcal":290,"p":9},{"n":"Fried rice (1 cup)","kcal":238,"p":6},{"n":"Khichdi (1 cup)","kcal":200,"p":8},{"n":"Banana (1 medium)","kcal":105,"p":1},{"n":"Apple (1 medium)","kcal":95,"p":0},{"n":"Orange (1 medium)","kcal":62,"p":1},{"n":"Mango (1 cup)","kcal":99,"p":1},{"n":"Grapes (1 cup)","kcal":104,"p":1},{"n":"Strawberries (1 cup)","kcal":49,"p":1},{"n":"Blueberries (1 cup)","kcal":84,"p":1},{"n":"Watermelon (1 cup)","kcal":46,"p":1},{"n":"Pineapple (1 cup)","kcal":82,"p":1},{"n":"Papaya (1 cup)","kcal":62,"p":1},{"n":"Pomegranate (1/2 cup)","kcal":72,"p":1},{"n":"Avocado (1/2)","kcal":120,"p":1},{"n":"Dates (3)","kcal":60,"p":1},{"n":"Raisins (1/4 cup)","kcal":108,"p":1},{"n":"Kiwi (1)","kcal":42,"p":1},{"n":"Pear (1 medium)","kcal":101,"p":1},{"n":"Broccoli, cooked (1 cup)","kcal":55,"p":4},{"n":"Spinach, cooked (1 cup)","kcal":41,"p":5},{"n":"Mixed salad (1 bowl)","kcal":33,"p":2},{"n":"Carrot (1 medium)","kcal":25,"p":1},{"n":"Cucumber (1 cup)","kcal":16,"p":1},{"n":"Tomato (1 medium)","kcal":22,"p":1},{"n":"Potato, boiled (1 medium)","kcal":130,"p":3},{"n":"Sweet potato (1 medium)","kcal":112,"p":2},{"n":"Cauliflower, cooked (1 cup)","kcal":29,"p":2},{"n":"Green beans (1 cup)","kcal":44,"p":2},{"n":"Bell pepper (1)","kcal":31,"p":1},{"n":"Mushrooms (1 cup)","kcal":21,"p":3},{"n":"Aloo gobi (1 cup)","kcal":180,"p":4},{"n":"Palak paneer (1 cup)","kcal":280,"p":12},{"n":"Mixed veg curry (1 cup)","kcal":160,"p":4},{"n":"Bhindi masala (1 cup)","kcal":150,"p":3},{"n":"Baingan bharta (1 cup)","kcal":150,"p":3},{"n":"Vegetable soup (1 cup)","kcal":75,"p":3},{"n":"Almonds (28g / 23 nuts)","kcal":164,"p":6},{"n":"Walnuts (28g)","kcal":185,"p":4},{"n":"Cashews (28g)","kcal":157,"p":5},{"n":"Peanuts (28g)","kcal":161,"p":7},{"n":"Pistachios (28g)","kcal":159,"p":6},{"n":"Chia seeds (1 tbsp)","kcal":58,"p":2},{"n":"Flax seeds (1 tbsp)","kcal":55,"p":2},{"n":"Pumpkin seeds (28g)","kcal":151,"p":7},{"n":"Trail mix (1/4 cup)","kcal":173,"p":5},{"n":"Cheeseburger (1)","kcal":303,"p":15},{"n":"Hamburger (1)","kcal":250,"p":12},{"n":"Big burger, double (1)","kcal":540,"p":25},{"n":"Pizza slice, cheese (1)","kcal":285,"p":12},{"n":"Pizza slice, pepperoni (1)","kcal":313,"p":13},{"n":"French fries (medium)","kcal":365,"p":4},{"n":"Fried chicken piece (1)","kcal":320,"p":21},{"n":"Chicken nuggets (6)","kcal":270,"p":14},{"n":"Hot dog (1)","kcal":290,"p":10},{"n":"Burrito, chicken (1)","kcal":420,"p":25},{"n":"Taco (1)","kcal":170,"p":8},{"n":"Sandwich, turkey (1)","kcal":320,"p":20},{"n":"Club sandwich (1)","kcal":590,"p":30},{"n":"Grilled cheese (1)","kcal":400,"p":15},{"n":"Samosa (1)","kcal":260,"p":4},{"n":"Spring roll (1)","kcal":150,"p":3},{"n":"Pakora (4)","kcal":220,"p":5},{"n":"Vada (2)","kcal":200,"p":5},{"n":"Pav bhaji (1 plate)","kcal":400,"p":9},{"n":"Chole bhature (1 plate)","kcal":450,"p":12},{"n":"Shawarma wrap (1)","kcal":450,"p":28},{"n":"Falafel wrap (1)","kcal":520,"p":16},{"n":"Ramen bowl (1)","kcal":436,"p":18},{"n":"Pad thai (1 plate)","kcal":400,"p":16},{"n":"Sushi roll (6 pcs)","kcal":255,"p":9},{"n":"Dumplings (5)","kcal":280,"p":11},{"n":"Potato chips (28g)","kcal":152,"p":2},{"n":"Popcorn (1 cup)","kcal":31,"p":1},{"n":"Dark chocolate (28g)","kcal":170,"p":2},{"n":"Milk chocolate bar (1)","kcal":235,"p":3},{"n":"Cookie (1)","kcal":78,"p":1},{"n":"Brownie (1)","kcal":132,"p":2},{"n":"Donut, glazed (1)","kcal":269,"p":4},{"n":"Ice cream (1/2 cup)","kcal":137,"p":2},{"n":"Gulab jamun (2)","kcal":300,"p":4},{"n":"Jalebi (2)","kcal":300,"p":2},{"n":"Rasgulla (2)","kcal":186,"p":4},{"n":"Ladoo (1)","kcal":185,"p":3},{"n":"Kheer (1/2 cup)","kcal":250,"p":6},{"n":"Halwa (1/2 cup)","kcal":350,"p":5},{"n":"Granola bar (1)","kcal":120,"p":3},{"n":"Rice cake (1)","kcal":35,"p":1},{"n":"Pretzels (28g)","kcal":108,"p":3},{"n":"Crackers (5)","kcal":80,"p":1},{"n":"Coffee, black (1 cup)","kcal":2,"p":0},{"n":"Latte (medium)","kcal":190,"p":12},{"n":"Cappuccino (1 cup)","kcal":74,"p":4},{"n":"Masala chai (1 cup)","kcal":105,"p":3},{"n":"Green tea (1 cup)","kcal":2,"p":0},{"n":"Orange juice (1 cup)","kcal":112,"p":2},{"n":"Apple juice (1 cup)","kcal":114,"p":0},{"n":"Cola (1 can)","kcal":140,"p":0},{"n":"Beer (1 can)","kcal":153,"p":2},{"n":"Red wine (1 glass)","kcal":125,"p":0},{"n":"Mango lassi (1 glass)","kcal":210,"p":6},{"n":"Smoothie, fruit (1)","kcal":200,"p":4},{"n":"Coconut water (1 cup)","kcal":46,"p":2},{"n":"Energy drink (1 can)","kcal":110,"p":1},{"n":"Sports drink (1 bottle)","kcal":80,"p":0},{"n":"Lemonade (1 cup)","kcal":99,"p":0},{"n":"Olive oil (1 tbsp)","kcal":119,"p":0},{"n":"Mayonnaise (1 tbsp)","kcal":94,"p":0},{"n":"Ketchup (1 tbsp)","kcal":17,"p":0},{"n":"Honey (1 tbsp)","kcal":64,"p":0},{"n":"Sugar (1 tsp)","kcal":16,"p":0},{"n":"Jam (1 tbsp)","kcal":56,"p":0},{"n":"Salad dressing (2 tbsp)","kcal":145,"p":0},{"n":"Soy sauce (1 tbsp)","kcal":8,"p":1}];
+
 /* ============ Storage ============ */
 const KEY = "appleFitnessTracker_v1";
 const WEEK_MS = 7*24*60*60*1000;
@@ -508,12 +543,34 @@ function load(){
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(store)); }catch(e){} }
 
-let store = load();
+function migrate(s){
+  if(!s.goals) s.goals={};
+  if(s.goals.steps==null) s.goals.steps=10000;
+  if(s.goals.burned==null) s.goals.burned=600;
+  if(s.goals.protein==null) s.goals.protein=150;
+  if(s.goals.water==null) s.goals.water=3000;
+  Object.values(s.days||{}).forEach(d=>{
+    if(!d.diet) d.diet={};
+    ["breakfast","lunch","dinner"].forEach(m=>{
+      const v=d.diet[m];
+      if(typeof v==="string") d.diet[m]= v.trim()? [{n:v.trim(),kcal:0,p:0}] : [];
+      else if(!Array.isArray(v)) d.diet[m]=[];
+    });
+    if(!d.stats) d.stats={};
+    ["steps","burned","consumed","protein"].forEach(k=>{ if(d.stats[k]==null) d.stats[k]=""; });
+    if(d.stats.water==null) d.stats.water=0;
+    if(!d.exercise) d.exercise={walkRun:{done:false,type:"walk",amount:""},gym:{done:false,groups:[]}};
+    if(!d.sleep) d.sleep={from:"",to:""};
+  });
+  return s;
+}
+
+let store = migrate(load());
 let cur = todayStr();
 
 function blankDay(){
   return {
-    diet:{breakfast:"",lunch:"",dinner:""},
+    diet:{breakfast:[],lunch:[],dinner:[]},
     exercise:{ walkRun:{done:false,type:"walk",amount:""}, gym:{done:false,groups:[]} },
     sleep:{from:"",to:""},
     stats:{steps:"",burned:"",consumed:"",protein:"",water:0}
@@ -599,9 +656,10 @@ function setMark(key, state){ // state: 'done' | 'partial' | 'none'
 function refreshChecklistState(){
   const d = day();
   // diet
-  const dietFilled = [d.diet.breakfast,d.diet.lunch,d.diet.dinner].filter(x=>x.trim()).length;
-  setMark("diet", dietFilled===3?"done":dietFilled>0?"partial":"none");
-  $("sum-diet").textContent = dietFilled? `${dietFilled}/3 meals logged` : "Breakfast · Lunch · Dinner";
+  const mealsLogged=["breakfast","lunch","dinner"].filter(m=>d.diet[m]&&d.diet[m].length).length;
+  setMark("diet", mealsLogged===3?"done":mealsLogged>0?"partial":"none");
+  const totCal=num(d.stats.consumed), totP=num(d.stats.protein);
+  $("sum-diet").textContent = mealsLogged? `${mealsLogged}/3 meals · ${totCal.toLocaleString()} cal · ${totP}g protein` : "Breakfast · Lunch · Dinner";
   // exercise
   const ex=d.exercise; const parts=[];
   if(ex.walkRun.done) parts.push((ex.walkRun.type==="run"?"Run":"Walk")+(ex.walkRun.amount?(" "+ex.walkRun.amount):""));
@@ -627,11 +685,12 @@ function renderDay(){
   const _dd=new Date(cur+"T00:00"); calView={y:_dd.getFullYear(),m:_dd.getMonth()};
   const d = day();
   $("dateLabel").textContent = prettyDate(cur);
-  // stats
+  // stats (steps & burned are manual; consumed & protein auto from food)
   $("in-steps").value=d.stats.steps; $("in-burned").value=d.stats.burned;
-  $("in-consumed").value=d.stats.consumed; $("in-protein").value=d.stats.protein;
-  // diet
-  $("diet-breakfast").value=d.diet.breakfast; $("diet-lunch").value=d.diet.lunch; $("diet-dinner").value=d.diet.dinner;
+  syncStatTiles();
+  // diet (food search inputs stay empty; items render below)
+  $("diet-breakfast").value=""; $("diet-lunch").value=""; $("diet-dinner").value="";
+  renderMeals();
   // exercise
   $("ex-walkrun").checked=d.exercise.walkRun.done;
   $("walkrun-detail").style.display=d.exercise.walkRun.done?"block":"none";
@@ -732,7 +791,7 @@ function addWater(delta){
 function setPill(id,on){ const el=$(id); if(el) el.classList.toggle("on",on); }
 function updateCompletion(){
   const d=day();
-  const diet=!!(d.diet.breakfast.trim()||d.diet.lunch.trim()||d.diet.dinner.trim());
+  const diet=["breakfast","lunch","dinner"].some(m=>d.diet[m]&&d.diet[m].length);
   const ex=d.exercise.walkRun.done||d.exercise.gym.done;
   const sl=!!(d.sleep.from&&d.sleep.to);
   setPill("pill-diet",diet); setPill("pill-exercise",ex); setPill("pill-sleep",sl);
@@ -752,7 +811,7 @@ function dayProgress(ds){
 }
 function dayLogged(ds){
   const d=store.days[ds]; if(!d) return false;
-  const diet=(d.diet.breakfast||d.diet.lunch||d.diet.dinner||"").trim();
+  const diet=["breakfast","lunch","dinner"].some(m=>d.diet[m]&&d.diet[m].length);
   const ex=d.exercise.walkRun.done||d.exercise.gym.done;
   const sl=d.sleep.from&&d.sleep.to;
   const st=num(d.stats.steps)||num(d.stats.burned)||num(d.stats.consumed)||num(d.stats.protein)||num(d.stats.water);
@@ -836,6 +895,113 @@ function attachAutocomplete(input, historyFn, seed){
   window.addEventListener("resize",()=>{ if(box.style.display!=="none") place(); });
 }
 
+/* ============ Nutrition / food log ============ */
+function foodMatches(q){
+  q=(q||"").trim().toLowerCase();
+  if(!q) return FOODS.slice(0,8);
+  const starts=[], incl=[];
+  for(const f of FOODS){ const nl=f.n.toLowerCase(); if(nl.startsWith(q)) starts.push(f); else if(nl.includes(q)) incl.push(f); }
+  return starts.concat(incl).slice(0,8);
+}
+function recomputeNutrition(){
+  const d=day(); let kcal=0,p=0;
+  ["breakfast","lunch","dinner"].forEach(m=>(d.diet[m]||[]).forEach(it=>{kcal+=it.kcal||0;p+=it.p||0;}));
+  d.stats.consumed=Math.round(kcal);
+  d.stats.protein=Math.round(p);
+}
+function renderMeals(){
+  ["breakfast","lunch","dinner"].forEach(m=>{
+    const list=$("meal-"+m); if(!list) return;
+    const items=day().diet[m]||[];
+    list.innerHTML=items.map((it,i)=>`<div class="fooditem"><span class="fi-n">${esc(it.n)}</span><span class="fi-m">${it.kcal} cal \u00b7 ${it.p}g</span><button class="fi-x" data-meal="${m}" data-i="${i}" aria-label="Remove">\u00d7</button></div>`).join("");
+  });
+}
+function syncStatTiles(){
+  const s=day().stats;
+  if($("in-consumed")) $("in-consumed").value = s.consumed ? s.consumed : "";
+  if($("in-protein"))  $("in-protein").value  = s.protein  ? s.protein  : "";
+}
+function afterDietChange(){
+  recomputeNutrition(); save();
+  renderMeals(); syncStatTiles();
+  updateRings();
+  refreshChecklistState();
+}
+async function offSearch(q){
+  if(q.length<3) return [];
+  const ctrl=new AbortController(), timer=setTimeout(()=>ctrl.abort(),4500);
+  try{
+    const url="https://world.openfoodfacts.org/cgi/search.pl?search_terms="+encodeURIComponent(q)+
+      "&search_simple=1&action=process&json=1&page_size=8&fields=product_name,brands,nutriments,serving_size";
+    const r=await fetch(url,{signal:ctrl.signal}); clearTimeout(timer);
+    if(!r.ok) return [];
+    const d=await r.json();
+    return (d.products||[]).map(p=>{
+      const nm=(p.product_name||"").trim(); if(!nm) return null;
+      const nut=p.nutriments||{};
+      let kcal=nut["energy-kcal_serving"], prot=nut["proteins_serving"], portion=p.serving_size;
+      if(kcal==null){ kcal=nut["energy-kcal_100g"]; prot=nut["proteins_100g"]; portion="100 g"; }
+      if(kcal==null) return null;
+      const brand=p.brands?(" \u00b7 "+p.brands.split(",")[0].trim()):"";
+      const label=(nm+(portion?(" ("+portion+")"):"")).slice(0,54)+brand;
+      return {n:label, kcal:Math.round(kcal), p:prot!=null?Math.round(prot):0, online:true};
+    }).filter(Boolean);
+  }catch(e){ clearTimeout(timer); return []; }
+}
+function attachFoodSearch(input, mealKey){
+  if(!input) return;
+  const box=document.createElement("div"); box.className="ac"; box.style.display="none";
+  document.body.appendChild(box);
+  let items=[], active=-1, seq=0;
+  function place(){ const r=input.getBoundingClientRect(); box.style.left=r.left+"px"; box.style.width=r.width+"px"; box.style.top=(r.bottom+6)+"px"; }
+  function render(q){
+    let html=items.map((f,i)=>`<div class="ac-item ac-food" data-i="${i}"><span class="fn">${esc(f.n)}${f.online?' <span class="off">online</span>':''}</span><span class="fm">${f.kcal} cal \u00b7 ${f.p}g</span></div>`).join("");
+    if(q) html+=`<div class="ac-item ac-custom" data-custom="1">\uff0b Add \u201c${esc(q)}\u201d as custom</div>`;
+    if(!html){ box.style.display="none"; return; }
+    box.innerHTML=html; active=-1; place(); box.style.display="block";
+  }
+  function build(){
+    const q=input.value.trim();
+    items=foodMatches(q); render(q);
+    if(q.length>=3){
+      const mySeq=++seq;
+      offSearch(q.toLowerCase()).then(extra=>{
+        if(mySeq!==seq || document.activeElement!==input) return;
+        const have=new Set(items.map(x=>x.n.toLowerCase()));
+        const add=extra.filter(o=>!have.has(o.n.toLowerCase()));
+        if(add.length){ items=items.concat(add); render(q); }
+      });
+    }
+  }
+  function addFood(f){ if(!f) return; day().diet[mealKey].push({n:f.n,kcal:f.kcal,p:f.p}); afterDietChange(); input.value=""; box.style.display="none"; toast(f.n.split(" (")[0].slice(0,28)+" added"); }
+  function addCustom(name){
+    if(!name) return;
+    const kc=parseFloat(prompt('Calories in "'+name+'" (kcal)?',""));
+    if(isNaN(kc)) return;
+    const pr=parseFloat(prompt("Protein (g)? (optional)",""));
+    day().diet[mealKey].push({n:name,kcal:Math.max(0,Math.round(kc)),p:isNaN(pr)?0:Math.max(0,Math.round(pr)),custom:true});
+    afterDietChange(); input.value=""; box.style.display="none";
+  }
+  function hi(){ [...box.children].forEach((c,i)=>c.classList.toggle("on",i===active)); const el=box.children[active]; if(el) el.scrollIntoView({block:"nearest"}); }
+  input.addEventListener("focus",build);
+  input.addEventListener("input",build);
+  input.addEventListener("blur",()=>setTimeout(()=>{box.style.display="none";},180));
+  box.addEventListener("mousedown",e=>{
+    const it=e.target.closest(".ac-item"); if(!it) return; e.preventDefault();
+    if(it.dataset.custom) addCustom(input.value.trim()); else addFood(items[+it.dataset.i]);
+  });
+  input.addEventListener("keydown",e=>{
+    if(box.style.display==="none") return;
+    const max=box.children.length-1;
+    if(e.key==="ArrowDown"){active=Math.min(active+1,max);hi();e.preventDefault();}
+    else if(e.key==="ArrowUp"){active=Math.max(active-1,0);hi();e.preventDefault();}
+    else if(e.key==="Enter"){ if(active>=0){ const el=box.children[active]; if(el.dataset.custom) addCustom(input.value.trim()); else addFood(items[active]); e.preventDefault(); } }
+    else if(e.key==="Escape"){ box.style.display="none"; }
+  });
+  window.addEventListener("scroll",()=>{ if(box.style.display!=="none") place(); },true);
+  window.addEventListener("resize",()=>{ if(box.style.display!=="none") place(); });
+}
+
 /* ============ Wire up ============ */
 function bind(){
   buildRings();
@@ -846,14 +1012,19 @@ function bind(){
   $("nextDay").onclick=()=>shift(1);
   $("goToday").onclick=()=>{ cur=todayStr(); renderDay(); };
 
-  // stats inputs
-  [["in-steps","steps"],["in-burned","burned"],["in-consumed","consumed"],["in-protein","protein"]].forEach(([id,k])=>{
+  // stats inputs (consumed & protein are auto from the food log)
+  [["in-steps","steps"],["in-burned","burned"]].forEach(([id,k])=>{
     $(id).addEventListener("input",e=>{ day().stats[k]=e.target.value; save(); updateRings(); });
   });
 
-  // diet
-  [["diet-breakfast","breakfast"],["diet-lunch","lunch"],["diet-dinner","dinner"]].forEach(([id,k])=>{
-    $(id).addEventListener("input",e=>{ day().diet[k]=e.target.value; save(); refreshChecklistState(); });
+  // remove food item (event delegation on the checklist card)
+  document.querySelectorAll(".meal-list").forEach(list=>{
+    list.addEventListener("click",e=>{
+      const x=e.target.closest(".fi-x"); if(!x) return;
+      const m=x.dataset.meal, i=+x.dataset.i;
+      day().diet[m].splice(i,1);
+      afterDietChange();
+    });
   });
 
   // accordion expand (ignore clicks on the toggle switch itself)
@@ -937,10 +1108,10 @@ function bind(){
   $("water-plus5").onclick=()=>addWater(500);
   $("water-minus").onclick=()=>addWater(-250);
 
-  // diet + amount autocomplete
-  attachAutocomplete($("diet-breakfast"), dietHistory, FOOD_SEED);
-  attachAutocomplete($("diet-lunch"), dietHistory, FOOD_SEED);
-  attachAutocomplete($("diet-dinner"), dietHistory, FOOD_SEED);
+  // diet food search + exercise amount autocomplete
+  attachFoodSearch($("diet-breakfast"),"breakfast");
+  attachFoodSearch($("diet-lunch"),"lunch");
+  attachFoodSearch($("diet-dinner"),"dinner");
   attachAutocomplete($("wr-amount"), amountHistory, AMOUNT_SEED);
 
   renderDay();
