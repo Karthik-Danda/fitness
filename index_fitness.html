@@ -203,6 +203,49 @@
     @keyframes up{from{transform:translateY(100%);}to{transform:none;}}
   }
 
+  /* ---------- Logged-today pills ---------- */
+  .logged-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:14px;}
+  .logged-label{font-size:13px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:var(--ink-3);}
+  .pills{display:flex;gap:7px;flex-wrap:wrap;}
+  .pill{font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;background:var(--card-2);color:var(--ink-3);transition:.18s;}
+  .pill.on{background:#E7F7EC;color:#1F9D4A;}
+  .logged-count{margin-left:auto;font-size:14px;font-weight:800;color:var(--ink-2);font-variant-numeric:tabular-nums;}
+
+  /* ---------- Mini-ring calendar ---------- */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin:12px 0 8px;}
+  .cal-head button{width:30px;height:30px;border:none;background:transparent;color:var(--blue);font-size:20px;font-weight:700;cursor:pointer;border-radius:9px;}
+  .cal-head button:active{background:var(--card-2);}
+  .cal-title{font-size:16px;font-weight:800;letter-spacing:-.01em;}
+  .cal-week{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+  .cal-week span{text-align:center;font-size:11px;font-weight:800;color:var(--ink-3);}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px 0;}
+  .cal-cell{border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;cursor:pointer;border-radius:11px;font-family:var(--font);}
+  .cal-cell:active{background:var(--card-2);}
+  .cal-cell.empty{visibility:hidden;cursor:default;}
+  .cal-ring{display:block;}
+  .cal-num{font-size:11px;font-weight:600;color:var(--ink-3);font-variant-numeric:tabular-nums;min-width:18px;height:16px;line-height:16px;text-align:center;border-radius:8px;}
+  .cal-cell.logged .cal-num{color:var(--ink);font-weight:800;}
+  .cal-cell.today .cal-num{color:var(--blue);font-weight:800;}
+  .cal-cell.sel .cal-num{background:var(--blue);color:#fff;font-weight:800;}
+
+  /* ---------- Autocomplete dropdown ---------- */
+  .ac{position:fixed;background:#fff;border-radius:14px;box-shadow:0 12px 36px rgba(0,0,0,.18);z-index:80;
+    overflow:hidden auto;border:1px solid var(--line);max-height:236px;}
+  .ac-item{padding:11px 14px;font-size:15px;font-weight:500;color:var(--ink);cursor:pointer;border-top:1px solid var(--line);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ac-item:first-child{border-top:none;}
+  .ac-item:hover,.ac-item.on{background:var(--card-2);}
+
+  /* ---------- Water drop ---------- */
+  .water{display:flex;flex-direction:column;align-items:center;gap:9px;flex:0 0 auto;}
+  .drop-svg{display:block;}
+  #water-fill{transition:y .55s cubic-bezier(.2,.8,.3,1);}
+  .water-val{font-size:14px;font-weight:700;color:var(--ink-3);font-variant-numeric:tabular-nums;}
+  .water-val b{font-size:20px;font-weight:800;color:var(--ink);}
+  .water-btns{display:flex;gap:6px;}
+  .water-btns button{border:none;background:#E7F4FE;color:#0091EA;border-radius:11px;padding:8px 11px;
+    font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:.12s;}
+  .water-btns button:active{filter:brightness(.94);}
+
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;
     background:#1C1C1E;color:#fff;padding:11px 20px;border-radius:999px;font-size:14px;font-weight:700;
     z-index:60;transition:.25s;pointer-events:none;}
@@ -235,9 +278,40 @@
           <p class="eyebrow">Move</p>
           <h2 class="card-title">Daily Stats</h2>
 
+          <div class="logged-row">
+            <span class="logged-label">Logged</span>
+            <div class="pills">
+              <span class="pill" id="pill-diet">Diet</span>
+              <span class="pill" id="pill-exercise">Exercise</span>
+              <span class="pill" id="pill-sleep">Sleep</span>
+            </div>
+            <span class="logged-count" id="comp-count">0/3</span>
+          </div>
+
           <div class="ringsrow" style="margin-top:16px;">
             <svg class="rings-svg" id="rings" width="180" height="180" viewBox="0 0 180 180"></svg>
             <div class="ring-legend" id="ringLegend"></div>
+            <div class="water">
+              <svg class="drop-svg" width="84" height="104" viewBox="0 0 86 108" aria-label="Water intake">
+                <defs>
+                  <clipPath id="dropclip"><path d="M43 6 C60 26 76 50 76 68 A33 33 0 0 1 10 68 C10 50 26 26 43 6 Z"/></clipPath>
+                  <linearGradient id="watergrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#5DCBFB"/><stop offset="1" stop-color="#0091EA"/>
+                  </linearGradient>
+                </defs>
+                <path d="M43 6 C60 26 76 50 76 68 A33 33 0 0 1 10 68 C10 50 26 26 43 6 Z" fill="#EAF6FE"/>
+                <g clip-path="url(#dropclip)">
+                  <rect id="water-fill" x="0" y="101" width="86" height="120" fill="url(#watergrad)"/>
+                </g>
+                <path d="M43 6 C60 26 76 50 76 68 A33 33 0 0 1 10 68 C10 50 26 26 43 6 Z" fill="none" stroke="#BFE3F7" stroke-width="2.5"/>
+              </svg>
+              <div class="water-val"><b id="water-amt">0.00</b> / <span id="water-target">3 L</span></div>
+              <div class="water-btns">
+                <button id="water-minus">−250</button>
+                <button id="water-plus">+250</button>
+                <button id="water-plus5">+500</button>
+              </div>
+            </div>
           </div>
 
           <div class="tiles" style="margin-top:18px;">
@@ -366,6 +440,20 @@
     <div class="col">
       <div class="card">
         <div class="card-pad">
+          <p class="eyebrow">History</p>
+          <h2 class="card-title">Calendar</h2>
+          <div class="cal-head">
+            <button id="calPrev" aria-label="Previous month">‹</button>
+            <div class="cal-title" id="calTitle">Month</div>
+            <button id="calNext" aria-label="Next month">›</button>
+          </div>
+          <div class="cal-week"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-pad">
           <p class="eyebrow">Weight</p>
           <h2 class="card-title">Trend</h2>
           <div id="weight-body" style="margin-top:14px;"></div>
@@ -412,7 +500,7 @@ function todayStr(d){
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 }
 function defaults(){
-  return { days:{}, weights:[], unit:"kg", goals:{steps:10000, burned:600, protein:150}, lastPrompt:null };
+  return { days:{}, weights:[], unit:"kg", goals:{steps:10000, burned:600, protein:150, water:3000}, lastPrompt:null };
 }
 function load(){
   try{ const s = JSON.parse(localStorage.getItem(KEY)); return s && s.days ? s : defaults(); }
@@ -428,7 +516,7 @@ function blankDay(){
     diet:{breakfast:"",lunch:"",dinner:""},
     exercise:{ walkRun:{done:false,type:"walk",amount:""}, gym:{done:false,groups:[]} },
     sleep:{from:"",to:""},
-    stats:{steps:"",burned:"",consumed:"",protein:""}
+    stats:{steps:"",burned:"",consumed:"",protein:"",water:0}
   };
 }
 function day(){
@@ -498,6 +586,7 @@ function updateRings(){
   $("ringLegend").innerHTML = legend;
   const net = num(s.consumed)-num(s.burned);
   $("netCal").textContent = (net>0?"+":"")+net.toLocaleString()+" cal";
+  updateCompletion(); renderCalendar();
 }
 
 /* ============ Completion state ============ */
@@ -523,6 +612,7 @@ function refreshChecklistState(){
   const sl=d.sleep;
   if(sl.from&&sl.to){ setMark("sleep","done"); $("sum-sleep").textContent = sl.from+" → "+sl.to+sleepDur(sl); }
   else { setMark("sleep","none"); $("sum-sleep").textContent="Set bed and wake time"; }
+  updateCompletion(); renderCalendar();
 }
 function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
 function sleepDur(sl){
@@ -534,6 +624,7 @@ function sleepDur(sl){
 
 /* ============ Render day into inputs ============ */
 function renderDay(){
+  const _dd=new Date(cur+"T00:00"); calView={y:_dd.getFullYear(),m:_dd.getMonth()};
   const d = day();
   $("dateLabel").textContent = prettyDate(cur);
   // stats
@@ -554,6 +645,7 @@ function renderDay(){
   $("sleep-duration").innerHTML = (d.sleep.from&&d.sleep.to)?("Slept <b>"+sleepDur(d.sleep).replace(/^\s*·\s*/,"")+"</b>"):"";
   updateRings();
   refreshChecklistState();
+  updateWater();
 }
 
 /* ============ Weight sidebar ============ */
@@ -619,6 +711,130 @@ function openWeightModal(weekly){
   setTimeout(()=>$("weightField").focus(),120);
 }
 function closeWeightModal(){ $("weightModal").classList.remove("show"); }
+
+/* ============ Water drop ============ */
+function updateWater(){
+  const ml=num(day().stats.water)||0;
+  const target=store.goals.water||3000;
+  const f=Math.min(ml/target,1);
+  const yTop=6, yBot=101, H=yBot-yTop;
+  const fill=$("water-fill"); if(fill) fill.setAttribute("y",(yBot - f*H).toFixed(1));
+  const amt=$("water-amt"); if(amt) amt.textContent=(ml/1000).toFixed(2);
+  const tg=$("water-target"); if(tg) tg.textContent=(target/1000)+" L";
+}
+function addWater(delta){
+  const d=day();
+  d.stats.water=Math.max(0,(num(d.stats.water)||0)+delta);
+  save(); updateWater(); renderCalendar();
+}
+
+/* ============ Completion pills ============ */
+function setPill(id,on){ const el=$(id); if(el) el.classList.toggle("on",on); }
+function updateCompletion(){
+  const d=day();
+  const diet=!!(d.diet.breakfast.trim()||d.diet.lunch.trim()||d.diet.dinner.trim());
+  const ex=d.exercise.walkRun.done||d.exercise.gym.done;
+  const sl=!!(d.sleep.from&&d.sleep.to);
+  setPill("pill-diet",diet); setPill("pill-exercise",ex); setPill("pill-sleep",sl);
+  const cnt=$("comp-count"); if(cnt) cnt.textContent=[diet,ex,sl].filter(Boolean).length+"/3";
+}
+
+/* ============ Mini-ring calendar ============ */
+let calView=null;
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function dayProgress(ds){
+  const d=store.days[ds]; if(!d) return null;
+  return {
+    burned: num(d.stats.burned)/(store.goals.burned||1),
+    steps:  num(d.stats.steps)/(store.goals.steps||1),
+    protein:num(d.stats.protein)/(store.goals.protein||1)
+  };
+}
+function dayLogged(ds){
+  const d=store.days[ds]; if(!d) return false;
+  const diet=(d.diet.breakfast||d.diet.lunch||d.diet.dinner||"").trim();
+  const ex=d.exercise.walkRun.done||d.exercise.gym.done;
+  const sl=d.sleep.from&&d.sleep.to;
+  const st=num(d.stats.steps)||num(d.stats.burned)||num(d.stats.consumed)||num(d.stats.protein)||num(d.stats.water);
+  return !!(diet||ex||sl||st);
+}
+function miniRings(ds){
+  const p=dayProgress(ds);
+  const defs=[{r:14,g:"gmove",k:"burned"},{r:10,g:"gsteps",k:"steps"},{r:6.5,g:"gprot",k:"protein"}];
+  let s='<svg class="cal-ring" width="34" height="34" viewBox="0 0 34 34">';
+  defs.forEach(rg=>{
+    const c=2*Math.PI*rg.r;
+    s+=`<circle cx="17" cy="17" r="${rg.r}" fill="none" stroke="#ECECF1" stroke-width="3"/>`;
+    const v=p?Math.min(p[rg.k],1):0;
+    if(v>0) s+=`<circle cx="17" cy="17" r="${rg.r}" fill="none" stroke="url(#${rg.g})" stroke-width="3" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-v)}" transform="rotate(-90 17 17)"/>`;
+  });
+  return s+'</svg>';
+}
+function renderCalendar(){
+  if(!calView){ const dd=new Date(cur+"T00:00"); calView={y:dd.getFullYear(),m:dd.getMonth()}; }
+  const t=$("calTitle"); if(t) t.textContent=MONTHS[calView.m]+" "+calView.y;
+  const grid=$("calGrid"); if(!grid) return;
+  const first=new Date(calView.y,calView.m,1).getDay();
+  const days=new Date(calView.y,calView.m+1,0).getDate();
+  const today=todayStr();
+  let html="";
+  for(let i=0;i<first;i++) html+='<span class="cal-cell empty"></span>';
+  for(let n=1;n<=days;n++){
+    const ds=calView.y+"-"+String(calView.m+1).padStart(2,"0")+"-"+String(n).padStart(2,"0");
+    const cls=["cal-cell"];
+    if(ds===today) cls.push("today");
+    if(ds===cur) cls.push("sel");
+    if(dayLogged(ds)) cls.push("logged");
+    html+=`<button class="${cls.join(" ")}" data-date="${ds}">${miniRings(ds)}<span class="cal-num">${n}</span></button>`;
+  }
+  grid.innerHTML=html;
+}
+
+/* ============ Autocomplete ============ */
+const FOOD_SEED=["Oatmeal with berries","Greek yogurt","Scrambled eggs","Avocado toast","Banana","Protein shake","Grilled chicken salad","Chicken and rice","Rice and dal","Paneer curry","Salmon with vegetables","Tuna sandwich","Omelette","Fruit smoothie","Idli with sambar","Masala dosa","Roti and sabzi","Pasta","Burrito bowl","Steak and potatoes"];
+const AMOUNT_SEED=["3 km","5 km","10 km","2 miles","5 miles","20 min","30 min","45 min","1 hour"];
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));}
+function dietHistory(){
+  const set=new Set();
+  Object.values(store.days).forEach(d=>{ if(d&&d.diet)["breakfast","lunch","dinner"].forEach(k=>{const v=(d.diet[k]||"").trim(); if(v) set.add(v);}); });
+  return [...set];
+}
+function amountHistory(){
+  const set=new Set();
+  Object.values(store.days).forEach(d=>{ const v=d&&d.exercise&&d.exercise.walkRun&&(d.exercise.walkRun.amount||"").trim(); if(v) set.add(v); });
+  return [...set];
+}
+function closeDropdowns(){ document.querySelectorAll(".ac").forEach(b=>b.style.display="none"); }
+function attachAutocomplete(input, historyFn, seed){
+  if(!input) return;
+  const box=document.createElement("div"); box.className="ac"; box.style.display="none";
+  document.body.appendChild(box);
+  let items=[], active=-1;
+  function place(){ const r=input.getBoundingClientRect(); box.style.left=r.left+"px"; box.style.width=r.width+"px"; box.style.top=(r.bottom+6)+"px"; }
+  function build(){
+    const q=input.value.trim().toLowerCase();
+    const pool=[...new Set([...(historyFn()||[]), ...seed])];
+    items=pool.filter(x=>{const xl=x.toLowerCase(); return xl!==q && (q===""?true:xl.includes(q));}).slice(0,6);
+    if(!items.length){ box.style.display="none"; return; }
+    box.innerHTML=items.map((x,i)=>`<div class="ac-item" data-i="${i}">${esc(x)}</div>`).join("");
+    active=-1; place(); box.style.display="block";
+  }
+  function choose(i){ input.value=items[i]; input.dispatchEvent(new Event("input",{bubbles:true})); box.style.display="none"; }
+  function hi(){ [...box.children].forEach((c,i)=>c.classList.toggle("on",i===active)); }
+  input.addEventListener("focus",build);
+  input.addEventListener("input",build);
+  input.addEventListener("blur",()=>setTimeout(()=>{box.style.display="none";},150));
+  box.addEventListener("mousedown",e=>{ const it=e.target.closest(".ac-item"); if(!it) return; e.preventDefault(); choose(+it.dataset.i); });
+  input.addEventListener("keydown",e=>{
+    if(box.style.display==="none") return;
+    if(e.key==="ArrowDown"){ active=Math.min(active+1,items.length-1); hi(); e.preventDefault(); }
+    else if(e.key==="ArrowUp"){ active=Math.max(active-1,0); hi(); e.preventDefault(); }
+    else if(e.key==="Enter"){ if(active>=0){ choose(active); e.preventDefault(); } }
+    else if(e.key==="Escape"){ box.style.display="none"; }
+  });
+  window.addEventListener("scroll",()=>{ if(box.style.display!=="none") place(); },true);
+  window.addEventListener("resize",()=>{ if(box.style.display!=="none") place(); });
+}
 
 /* ============ Wire up ============ */
 function bind(){
@@ -707,6 +923,25 @@ function bind(){
     store.lastPrompt=today; save(); closeWeightModal(); renderWeight(); toast("Weight saved");
   };
   $("weightField").addEventListener("keydown",e=>{ if(e.key==="Enter") $("saveWeight").click(); });
+
+  // calendar
+  $("calPrev").onclick=()=>{ if(!calView)return; calView.m--; if(calView.m<0){calView.m=11;calView.y--;} renderCalendar(); };
+  $("calNext").onclick=()=>{ if(!calView)return; calView.m++; if(calView.m>11){calView.m=0;calView.y++;} renderCalendar(); };
+  $("calGrid").addEventListener("click",e=>{
+    const cell=e.target.closest(".cal-cell"); if(!cell||cell.classList.contains("empty")) return;
+    cur=cell.dataset.date; closeDropdowns(); renderDay();
+  });
+
+  // water
+  $("water-plus").onclick=()=>addWater(250);
+  $("water-plus5").onclick=()=>addWater(500);
+  $("water-minus").onclick=()=>addWater(-250);
+
+  // diet + amount autocomplete
+  attachAutocomplete($("diet-breakfast"), dietHistory, FOOD_SEED);
+  attachAutocomplete($("diet-lunch"), dietHistory, FOOD_SEED);
+  attachAutocomplete($("diet-dinner"), dietHistory, FOOD_SEED);
+  attachAutocomplete($("wr-amount"), amountHistory, AMOUNT_SEED);
 
   renderDay();
   renderWeight();
